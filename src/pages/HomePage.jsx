@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useCart } from '../CartContext.jsx';
+import KamdhenuHero from "../components/ui/KamdhenuHero";
+import FooterShop from "../components/ui/FooterShop";
+import FABs from "../components/ui/FABs.jsx";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -40,6 +43,7 @@ export default function HomePage() {
     };
   }, []);
 
+  
   function getQuantity(productId) {
     const it = items.find((i) => i.productId === productId);
     return it ? it.quantity : 0;
@@ -56,6 +60,7 @@ export default function HomePage() {
   }
 
   return (
+    
     <div style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial' }}>
       {/* Intrusive Kamdhenu hero */}
       <header
@@ -203,6 +208,15 @@ export default function HomePage() {
           )}
         </section>
       </main>
+      <KamdhenuHero />
+
+<section id="products-section">
+  {/* your existing products code */}
+</section>
+
+<FABs />
+<FooterShop />
+
 
       {/* Sticky Cart Summary (shows only if cart has items) */}
       {items.length > 0 && (
