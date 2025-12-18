@@ -1,35 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Public pages
+import HomePage from './pages/HomePage';
+import CheckoutPage from './pages/CheckoutPage';
+
+// Admin pages
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminOrdersPage from './pages/admin/AdminOrdersPage';
+import AdminProductsPage from './pages/admin/AdminProductsPage';
+import AdminOrderDetail from './pages/admin/AdminOrderDetail';
+
+// Route guards
+import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+
+        {/* 🌐 Public routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+
+        {/* 🔐 Admin auth */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* 🔒 Admin protected routes */}
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminProtectedRoute>
+              <AdminOrdersPage />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/orders/:id"
+          element={
+            <AdminProtectedRoute>
+              <AdminOrderDetail />
+            </AdminProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/products"
+          element={
+            <AdminProtectedRoute>
+              <AdminProductsPage />
+            </AdminProtectedRoute>
+          }
+        />
+
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
