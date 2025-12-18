@@ -1,57 +1,41 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Public pages
 import HomePage from './pages/HomePage';
 import CheckoutPage from './pages/CheckoutPage';
 
-// Admin pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminProductsPage from './pages/admin/AdminProductsPage';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 
-// Route guards
 import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
+import AdminLayout from './components/admin/AdminLayout';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* 🌐 Public routes */}
+        {/* Public */}
         <Route path="/" element={<HomePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
 
-        {/* 🔐 Admin auth */}
+        {/* Admin login */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
 
-        {/* 🔒 Admin protected routes */}
+        {/* 🔐 EVERYTHING under /admin is protected */}
         <Route
-          path="/admin/orders"
+          path="/admin"
           element={
             <AdminProtectedRoute>
-              <AdminOrdersPage />
+              <AdminLayout />
             </AdminProtectedRoute>
           }
-        />
-
-        <Route
-          path="/admin/orders/:id"
-          element={
-            <AdminProtectedRoute>
-              <AdminOrderDetail />
-            </AdminProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/products"
-          element={
-            <AdminProtectedRoute>
-              <AdminProductsPage />
-            </AdminProtectedRoute>
-          }
-        />
+        >
+          <Route path="orders" element={<AdminOrdersPage />} />
+          <Route path="orders/:id" element={<AdminOrderDetail />} />
+          <Route path="products" element={<AdminProductsPage />} />
+        </Route>
 
       </Routes>
     </BrowserRouter>
