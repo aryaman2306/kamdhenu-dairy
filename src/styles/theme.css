@@ -1,0 +1,23 @@
+:root {
+  --cream: #fffaf3;
+  --brown: #4b3621;
+  --saffron: #c56a1a;
+  --text-muted: #6b5a4a;
+  --border-soft: #eee2d6;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--cream);
+  color: var(--brown);
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+button {
+  font-family: inherit;
+}
