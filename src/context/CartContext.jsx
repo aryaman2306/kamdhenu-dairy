@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  // Load from localStorage initially
   const [items, setItems] = useState(() => {
     try {
       const raw = localStorage.getItem('kamdhenu_cart_v1');
@@ -14,7 +13,6 @@ export function CartProvider({ children }) {
     }
   });
 
-  // Save to localStorage whenever items change
   useEffect(() => {
     try {
       localStorage.setItem('kamdhenu_cart_v1', JSON.stringify(items));
@@ -23,7 +21,6 @@ export function CartProvider({ children }) {
     }
   }, [items]);
 
-  // Update quantity logic
   function setItemQuantity(product, quantity) {
     setItems((prev) => {
       if (quantity <= 0) {
@@ -76,6 +73,7 @@ export function CartProvider({ children }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCart() {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be inside CartProvider');

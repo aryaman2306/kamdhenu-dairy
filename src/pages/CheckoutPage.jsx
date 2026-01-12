@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { useCart } from '../CartContext';
+import { useCart } from  '../context/CartContext';
 
 export default function CheckoutPage() {
   const { items, totalAmount, clearCart } = useCart();
