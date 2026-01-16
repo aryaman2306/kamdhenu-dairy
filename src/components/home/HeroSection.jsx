@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export default function HeroSection() {
+  const navigate = useNavigate();
   return (
     <section
       style={{
@@ -62,11 +65,8 @@ export default function HeroSection() {
 
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
           <button
-            onClick={() =>
-              document
-                .getElementById('products-section')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            }
+              onClick={() => navigate('/catalog')}
+            
             style={{
               background: '#c56a1a',
               color: '#fff',

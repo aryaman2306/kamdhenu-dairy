@@ -1,162 +1,228 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
-import { useCart } from  '../context/CartContext';
+import { useState } from "react";
+import { useCart } from "../context/CartContext";
+import { supabase } from "../supabaseClient";
 
 export default function CheckoutPage() {
   const { items, totalAmount, clearCart } = useCart();
-  const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('COD'); // COD or UPI
-  const [notes, setNotes] = useState('');
-
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  // Simple validation
-  function validate() {
-    if (!name.trim()) return 'Please enter your name';
-    if (!phone.trim()) return 'Please enter your phone number';
-    if (!address.trim()) return 'Please enter your delivery address';
-    if (items.length === 0) return 'Your cart is empty';
-    return null;
-  }
+  async function placeOrder() {
+    if (!name || !phone || !address) {
+      alert("Please fill all details");
+      return;
+    }
 
-  async function handlePlaceOrder(e) {
-    e.preventDefault();
-    setError(null);
-
-    const v = validate();
-    if (v) {
-      setError(v);
+    if (items.length === 0) {
+      alert("Your cart is empty");
       return;
     }
 
     setLoading(true);
+
     try {
-      // 1) Insert order row
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert([
-          {
-            customer_name: name,
-            customer_phone: phone,
-            customer_address: address,
-            notes,
-            payment_method: paymentMethod,
-            is_paid: paymentMethod === 'UPI' ? false : false, // you'll update when paid
-            status: 'PENDING',
-            total_amount: totalAmount,
-          },
-        ])
+      // 1️⃣ Create order
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          customer_name: name,
+          customer_phone: phone,
+          customer_address: address,
+          total_amount: totalAmount,
+          payment_method: "COD",
+        })
         .select()
         .single();
 
       if (orderError) throw orderError;
-      const orderId = orderData.id;
 
-      // 2) Insert order_items rows
-      const orderItemsPayload = items.map((it) => ({
-        order_id: orderId,
-        product_id: it.productId,
-        quantity: it.quantity,
-        unit_price: it.pricePerUnit,
-        line_total: Number((it.pricePerUnit * it.quantity).toFixed(2)),
+      // 2️⃣ Create order items (SCALABLE MODEL)
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_id: item.productId,
+        quantity: item.quantity,
+        unit_price: item.pricePerUnit,
+        line_total: item.pricePerUnit * item.quantity,
       }));
 
       const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItemsPayload);
+        .from("order_items")
+        .insert(orderItems);
 
-      if (itemsError) {
-        // Attempt to rollback by deleting the order we just created (best-effort)
-        await supabase.from('orders').delete().eq('id', orderId);
-        throw itemsError;
-      }
+      if (itemsError) throw itemsError;
 
-      // Success! clear cart and navigate to success page
       clearCart();
-      navigate(`/order-success/${orderId}`);
+      setSuccess(true);
     } catch (err) {
-      console.error('Place order error:', err);
-      setError(err.message || 'Failed to place order. Try again.');
+      console.error("Order placement failed:", err);
+      alert("Failed to place order. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div style={{ padding: '1rem', maxWidth: 720, margin: '0 auto' }}>
-      <h1>Checkout</h1>
-
-      {error && (
-        <div style={{ background: '#ffe8e8', padding: '0.6rem', marginBottom: '0.75rem', color: '#900' }}>
-          {error}
+  /* ================= THANK YOU PAGE ================= */
+  if (success) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#f9fbfd",
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            padding: 40,
+            borderRadius: 20,
+            textAlign: "center",
+            maxWidth: 420,
+            boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h2 style={{ marginBottom: 12 }}>🙏 Thank you!</h2>
+          <p style={{ color: "#374151", marginBottom: 16 }}>
+            Your order has been placed successfully.
+          </p>
+          <p style={{ color: "#6b7280", fontSize: 14 }}>
+            Our team will contact you shortly for confirmation and delivery.
+          </p>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {items.length === 0 ? (
-        <p>Your cart is empty. Go back to the home page to add items.</p>
-      ) : (
-        <form onSubmit={handlePlaceOrder}>
-          <section style={{ marginBottom: '1rem' }}>
-            <h3>Order Summary</h3>
-            <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
-              {items.map((it) => (
-                <li key={it.productId} style={{ marginBottom: '0.35rem' }}>
-                  {it.name} — {it.quantity} {it.unit} @ ₹{it.pricePerUnit} =&nbsp;
-                  ₹{(it.pricePerUnit * it.quantity).toFixed(2)}
-                </li>
-              ))}
-            </ul>
-            <p style={{ fontWeight: 'bold', marginTop: '0.5rem' }}>Total: ₹{totalAmount.toFixed(2)}</p>
-          </section>
+  /* ================= CHECKOUT UI ================= */
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f9fbfd",
+        padding: "40px 16px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 760,
+          margin: "0 auto",
+          background: "#fff",
+          padding: 28,
+          borderRadius: 20,
+          boxShadow: "0 20px 40px rgba(0,0,0,0.06)",
+        }}
+      >
+        <h2 style={{ marginBottom: 20 }}>Checkout</h2>
 
-          <section style={{ marginBottom: '1rem' }}>
-            <h3>Customer details</h3>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Name
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
-            </label>
+        {/* CUSTOMER DETAILS */}
+        <div style={{ display: "grid", gap: 14 }}>
+          <Input label="Name" value={name} onChange={setName} />
+          <Input label="Phone" value={phone} onChange={setPhone} />
+          <Textarea label="Address" value={address} onChange={setAddress} />
+        </div>
 
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Phone
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone number" style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
-            </label>
+        {/* ORDER SUMMARY */}
+        <h3 style={{ marginTop: 28 }}>Order Summary</h3>
+        <div style={{ marginTop: 12 }}>
+          {items.map((item) => (
+            <div
+              key={item.productId}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "8px 0",
+                borderBottom: "1px dashed #e5e7eb",
+                fontSize: 14,
+              }}
+            >
+              <span>
+                {item.name} × {item.quantity}
+              </span>
+              <span>
+                ₹{item.pricePerUnit * item.quantity}
+              </span>
+            </div>
+          ))}
+        </div>
 
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Address
-              <textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Delivery address" rows={3} style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
-            </label>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 16,
+            fontWeight: 700,
+          }}
+        >
+          <span>Total</span>
+          <span>₹{totalAmount}</span>
+        </div>
 
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Payment method
-              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}>
-                <option value="COD">Cash on delivery (COD)</option>
-                <option value="UPI">UPI (customer will pay via UPI on delivery or you can send an invoice)</option>
-              </select>
-            </label>
-
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Notes (optional)
-              <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="E.g., deliver before 8 AM" style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
-            </label>
-          </section>
-
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button type="submit" disabled={loading} style={{ padding: '0.6rem 1rem', background: '#0b6', color: 'white', border: 'none', borderRadius: 6 }}>
-              {loading ? 'Placing order...' : 'Place Order'}
-            </button>
-
-            <button type="button" onClick={() => navigate('/')} style={{ padding: '0.6rem 1rem', borderRadius: 6 }}>
-              Continue shopping
-            </button>
-          </div>
-        </form>
-      )}
+        <button
+          onClick={placeOrder}
+          disabled={loading}
+          style={{
+            marginTop: 28,
+            width: "100%",
+            padding: "16px 0",
+            background: "#c56a1a",
+            color: "#fff",
+            border: "none",
+            borderRadius: 14,
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "Placing Order…" : "Place Order"}
+        </button>
+      </div>
     </div>
+  );
+}
+
+/* ================= SMALL UI HELPERS ================= */
+
+function Input({ label, value, onChange }) {
+  return (
+    <label style={{ fontSize: 14 }}>
+      {label}
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: "100%",
+          padding: 12,
+          borderRadius: 10,
+          border: "1px solid #d1d5db",
+          marginTop: 6,
+        }}
+      />
+    </label>
+  );
+}
+
+function Textarea({ label, value, onChange }) {
+  return (
+    <label style={{ fontSize: 14 }}>
+      {label}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={3}
+        style={{
+          width: "100%",
+          padding: 12,
+          borderRadius: 10,
+          border: "1px solid #d1d5db",
+          marginTop: 6,
+        }}
+      />
+    </label>
   );
 }

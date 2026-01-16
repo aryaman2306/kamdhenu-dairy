@@ -1,122 +1,96 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
+// eslint-disable-next-line no-unused-vars
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "../../supabaseClient";
 
 export default function AdminOrderDetail() {
+  
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [order, setOrder] = useState(null);
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!id) return;
-    load();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/immutability
+    loadOrder();
   }, [id]);
 
-  async function load() {
-    setLoading(true);
-    try {
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', id)
-        .single();
-      if (orderError) throw orderError;
-      setOrder(orderData);
+  async function loadOrder() {
+    const { data: orderData } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-      const { data: itemsData, error: itemsError } = await supabase
-        .from('order_items')
-        .select('*, products(name, unit)')
-        .eq('order_id', id);
-      if (itemsError) throw itemsError;
-      setItems(itemsData || []);
-    } catch (err) {
-      console.error('Load order detail error', err);
-      setError(err.message || 'Failed to load order');
-    } finally {
-      setLoading(false);
-    }
+    const { data: itemsData } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", id);
+
+    setOrder(orderData);
+    setItems(itemsData || []);
   }
 
-  async function handleSave(e) {
-    e.preventDefault();
-    if (!order) return;
+  async function saveChanges() {
     setSaving(true);
-    setError(null);
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: order.status, is_paid: order.is_paid })
-        .eq('id', order.id);
-      if (error) throw error;
-      await load();
-    } catch (err) {
-      console.error('Save order error', err);
-      setError(err.message || 'Save failed');
-    } finally {
-      setSaving(false);
-    }
+
+    await supabase.from("orders").update({
+      customer_name: order.customer_name,
+      customer_phone: order.customer_phone,
+      customer_address: order.customer_address,
+      order_status: order.order_status,
+      payment_status: order.payment_status,
+    }).eq("id", id);
+
+    setSaving(false);
+    alert("Order updated");
   }
 
-  if (loading) return <div style={{ padding: 20 }}>Loading…</div>;
-  if (error) return <div style={{ padding: 20, color: 'crimson' }}>{error}</div>;
-  if (!order) return <div style={{ padding: 20 }}>Order not found</div>;
+  if (!order) return <div style={{ padding: 30 }}>Loading…</div>;
 
   return (
-    <div style={{ padding: 20, maxWidth: 900 }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom: 12 }}>← Back</button>
+    <div style={{ padding: 30, maxWidth: 600 }}>
+      <h3>Order Details</h3>
 
-      <h3>Order: {order.id}</h3>
-      <div style={{ marginBottom: 8 }}>
-        <strong>{order.customer_name}</strong> — {order.customer_phone}
-      </div>
-      <div style={{ marginBottom: 12 }}>{order.customer_address}</div>
+      <label>Name</label>
+      <input value={order.customer_name} onChange={e => setOrder({ ...order, customer_name: e.target.value })} />
 
-      <section style={{ marginBottom: 12 }}>
-        <h4>Items</h4>
-        <ul>
-          {items.map((it) => (
-            <li key={it.id}>
-              {it.products?.name || 'Item'} — {it.quantity} {it.products?.unit || ''} = ₹{it.line_total}
-            </li>
-          ))}
-        </ul>
-        <div style={{ fontWeight: 800 }}>Total: ₹{Number(order.total_amount).toFixed(2)}</div>
-      </section>
+      <label>Phone</label>
+      <input value={order.customer_phone} onChange={e => setOrder({ ...order, customer_phone: e.target.value })} />
 
-      <form onSubmit={handleSave} style={{ display: 'grid', gap: 8, maxWidth: 420 }}>
-        <label>
-          Status
-          <select value={order.status} onChange={(e) => setOrder({ ...order, status: e.target.value })} style={{ width: '100%', padding: 8 }}>
-            <option value="PENDING">PENDING</option>
-            <option value="ACCEPTED">ACCEPTED</option>
-            <option value="DELIVERING">DELIVERING</option>
-            <option value="DELIVERED">DELIVERED</option>
-            <option value="CANCELLED">CANCELLED</option>
-          </select>
-        </label>
+      <label>Address</label>
+      <textarea value={order.customer_address} onChange={e => setOrder({ ...order, customer_address: e.target.value })} />
 
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <input type="checkbox" checked={!!order.is_paid} onChange={(e) => setOrder({ ...order, is_paid: e.target.checked })} />
-          Paid
-        </label>
+      <label>Order Status</label>
+      <select value={order.order_status} onChange={e => setOrder({ ...order, order_status: e.target.value })}>
+        <option>PENDING</option>
+        <option>CONFIRMED</option>
+        <option>DELIVERED</option>
+        <option>CANCELLED</option>
+      </select>
 
-        {error && <div style={{ color: 'crimson' }}>{error}</div>}
+      <label>Payment Status</label>
+      <select value={order.payment_status} onChange={e => setOrder({ ...order, payment_status: e.target.value })}>
+        <option>UNPAID</option>
+        <option>PAID</option>
+      </select>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={saving} style={{ padding: '8px 12px', background: '#0b6', color: '#fff', border: 'none', borderRadius: 6 }}>
-            {saving ? 'Saving…' : 'Save changes'}
-          </button>
+      <h4>Items</h4>
+      <ul>
+        {items.map(i => (
+          <li key={i.id}>
+            {i.product_name} × {i.quantity}
+          </li>
+        ))}
+      </ul>
 
-          <button type="button" onClick={() => navigate('/admin/orders')} style={{ padding: '8px 12px', borderRadius: 6 }}>
-            Back to orders
-          </button>
-        </div>
-      </form>
+      <button onClick={saveChanges} disabled={saving}>
+        {saving ? "Saving…" : "Save Changes"}
+      </button>
+
+      <button onClick={() => navigate(-1)}>Back</button>
     </div>
   );
 }
