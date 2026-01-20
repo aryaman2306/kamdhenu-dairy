@@ -1,0 +1,168 @@
+/* HEADER */
+.kd-header {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.kd-header.minimal {
+  justify-content: center;
+}
+
+/* BRAND */
+.kd-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.kd-brand img {
+  width: 36px;
+  height: 36px;
+}
+
+/* NAV */
+.kd-nav {
+   flex: 1;
+  display: flex;
+  justify-content: flex-start;  /* ⬅ not center */
+  margin-left: 48px; 
+}
+
+.kd-nav-link {
+  position: relative;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 600;          /* ⬅ stronger */
+  font-size: 15px;
+  letter-spacing: 0.4px;     /* ⬅ premium spacing */
+  padding: 6px 0;
+}
+
+.kd-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #0f172a;
+  transition: width 0.25s ease;
+}
+
+.kd-nav-link:hover::after {
+  width: 100%;
+}
+
+/* ACTIONS */
+.kd-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.kd-cart-btn {
+  position: relative;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.kd-cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #dc2626;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+/* HAMBURGER */
+.kd-hamburger {
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* DRAWER */
+.kd-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 100%;
+  background: white;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 50;
+}
+
+.kd-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  float: right;
+  cursor: pointer;
+}
+
+.kd-drawer-links {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.kd-drawer-links a {
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.kd-drawer-footer {
+  position: absolute;
+  bottom: 20px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* FLOATING CART */
+.kd-floating-cart {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 40;
+}
+
+.kd-floating-cart span {
+  font-size: 12px;
+  background: #2cdc26;
+  padding: 2px 6px;
+  border-radius: 999px;
+}

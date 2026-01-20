@@ -1,51 +1,57 @@
+import "../../styles/partnership.css";
+
 export default function PartnershipSection() {
   return (
-    <section
-      style={{
-        padding: '80px 0',
-        background: '#fff',
-        borderTop: '1px solid var(--border-soft)',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 820,
-          margin: '0 auto',
-          padding: '0 20px',
-        }}
-      >
-        <h3
-          style={{
-            fontSize: '1.8rem',
-            marginBottom: 16,
-          }}
-        >
-          Trusted Partnership
-        </h3>
+    <section className="partnership-section">
+      {/* Mandala Background */}
+      <div className="partnership-bg" />
 
-        <p
-          style={{
-            fontSize: '1.05rem',
-            lineHeight: 1.8,
-            color: 'var(--text-muted)',
-          }}
-        >
-          Kamdhenu Dairy operates in association with established dairy networks
-          such as Mother Dairy, ensuring adherence to recognised quality
-          standards, hygienic handling, and responsible distribution practices.
-        </p>
+      <div className="partnership-wrapper">
+        {/* LEFT : HANDSHAKE IMAGE */}
+        <div className="partnership-image">
+          <div className="image-frame">
+            <img
+              src="/images/partner.jpg"
+              alt="Trusted partnership with Mother Dairy"
+            />
+          </div>
+        </div>
 
-        <p
-          style={{
-            fontSize: '1.05rem',
-            lineHeight: 1.8,
-            color: 'var(--text-muted)',
-            marginTop: 16,
-          }}
-        >
-          This collaboration allows us to combine the reliability of a trusted
-          institution with the care and accountability of a local dairy.
-        </p>
+        {/* RIGHT : CONTENT */}
+        <div className="partnership-content">
+          <h2>
+            A Partnership Built on{" "}
+            <span>Trust, Scale & Standards</span>
+          </h2>
+
+          <p>
+            Mother Dairy is one of India’s most trusted dairy institutions,
+            recognised for its extensive cold-chain network, farmer-first
+            procurement model, and disciplined quality assurance systems that
+            serve millions of households every day.
+          </p>
+
+          <p>
+            Kamdhenu Dairy aligns with these institutional standards while
+            remaining deeply rooted in India’s heritage of purity and
+            nourishment. This partnership reflects a shared commitment to
+            consistency, transparency, and responsible sourcing across the
+            supply chain.
+          </p>
+
+          <p>
+            Together, we combine large-scale operational reliability with
+            time-honoured values — delivering dairy products that consumers can
+            trust without compromise.
+          </p>
+
+          <div className="partnership-highlights">
+            <span>Pan-India cold-chain discipline</span>
+            <span>Institutional quality controls</span>
+            <span>Farmer-connected sourcing network</span>
+            <span>Reliable & scalable distribution</span>
+          </div>
+        </div>
       </div>
     </section>
   );

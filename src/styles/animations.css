@@ -1,0 +1,15 @@
+@keyframes mandalaMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 400px 400px;
+  }
+}
+
+/* Mandala texture utility */
+.kd-mandala-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Ctext x='22' y='28' text-anchor='middle' font-size='16' font-weight='600' fill='rgba(234,88,12,0.18)'%3E%2B%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: mandalaMove 60s linear infinite;
+}

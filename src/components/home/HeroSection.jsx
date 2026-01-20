@@ -1,101 +1,48 @@
 import { useNavigate } from "react-router-dom";
+import "../../styles/hero.css";
 
 export default function HeroSection() {
   const navigate = useNavigate();
+
   return (
-    <section
-      style={{
-        position: 'relative',
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Background image */}
-      <img
-        src="/images/hero-bg.jpg"
-        alt="Kamdhenu Dairy"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-        }}
-      />
+    <section className="kd-hero">
+      {/* Single rotating mandala */}
+      <div className="kd-hero-mandala" />
 
-      {/* VERY SUBTLE vignette overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at center, rgba(0,0,0,0.15), rgba(0,0,0,0.45))',
-        }}
-      />
+      {/* Inner layout */}
+      <div className="kd-hero-inner">
+        <div className="kd-hero-content">
+          <span className="kd-badge">✨ From the Divine Kamdhenu</span>
 
-      {/* Content */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          maxWidth: 720,
-          padding: '0 24px',
-          marginLeft: '6vw',
-          color: '#fff',
-        }}
-      >
-        <h1 style={{ fontSize: '3.2rem', marginBottom: 14 }}>
-          Pure Goodness of Nature
-        </h1>
+          <h1>
+            Pure & Divine <br />
+            <span>Dairy Blessings</span>
+          </h1>
 
-        <p
-          style={{
-            fontSize: '1.15rem',
-            lineHeight: 1.6,
-            marginBottom: 28,
-            maxWidth: 520,
-            color: '#f5f5f5',
-          }}
-        >
-          Fresh milk and dairy products rooted in tradition, purity, and care —
-          inspired by Kamdhenu, the divine symbol of nourishment.
-        </p>
+          <p className="kd-hero-text">
+            Experience the sacred blessings of Kamdhenu, the wish-fulfilling
+            divine cow, through premium dairy rooted in purity and tradition.
+          </p>
 
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-          <button
-              onClick={() => navigate('/catalog')}
-            
-            style={{
-              background: '#c56a1a',
-              color: '#fff',
-              padding: '14px 22px',
-              borderRadius: 10,
-              border: 'none',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            Order Now
-          </button>
+          <div className="kd-hero-actions">
+            <button
+              className="kd-btn-primary"
+              onClick={() => navigate("/catalog")}
+            >
+              Explore Products
+            </button>
 
-<a href="tel:+919812345678">
-  <button
-    style={{
-      background: 'rgba(227, 127, 26, 0.85)', // warm brown
-      color: '#fff',
-      padding: '14px 22px',
-      borderRadius: 10,
-      border: '1px solid rgba(255,255,255,0.25)',
-      fontWeight: 600,
-      cursor: 'pointer',
-      backdropFilter: 'blur(2px)',
-    }}
-  >
-    Call Us
-  </button>
-</a>
+            <button
+              className="kd-btn-outline"
+              onClick={() => navigate("/about")}
+            >
+              Our Story
+            </button>
+          </div>
+        </div>
+
+        <div className="kd-hero-image-wrap">
+          <img src="/images/hero-bg.jpg" alt="Kamdhenu Dairy" />
         </div>
       </div>
     </section>

@@ -1,0 +1,117 @@
+/* =========================
+   BUTTON BASE
+========================= */
+
+.kd-btn-primary,
+.kd-btn-outline,
+.kd-login-btn,
+.kd-cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 999px;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+/* =========================
+   PRIMARY BUTTON
+   (Explore Products)
+========================= */
+
+.kd-btn-primary {
+  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  color: #ffffff;
+  padding: 14px 26px;
+  font-weight: 600;
+  border: none;
+
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.25);
+}
+
+.kd-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(234, 88, 12, 0.35);
+}
+
+.kd-btn-primary:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.25);
+}
+
+/* =========================
+   OUTLINE BUTTON
+   (Our Story)
+========================= */
+
+.kd-btn-outline {
+  background: transparent;
+  color: #ea580c;
+  padding: 14px 26px;
+  font-weight: 600;
+  border: 2px solid rgba(234, 88, 12, 0.6);
+}
+
+.kd-btn-outline:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.25);
+}
+
+.kd-btn-outline:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(234, 88, 12, 0.2);
+}
+
+/* =========================
+   LOGIN / SIGNUP BUTTON
+   (Header)
+========================= */
+
+.kd-login-btn {
+  background: linear-gradient(90deg, #f59e0b, #ea580c);
+  color: #fff;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.25);
+}
+
+.kd-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.35);
+}
+
+.kd-login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+}
+
+/* =========================
+   CART ICON BUTTON
+========================= */
+
+.kd-cart-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.kd-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.25);
+}
+
+.kd-cart-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}

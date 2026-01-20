@@ -1,0 +1,109 @@
+/* ===============================
+   SACRED WISDOM SECTION
+   (ISOLATED – NO BLEED)
+================================ */
+
+.sacred-section {
+  position: relative;
+  isolation: isolate; /* 🔑 CRITICAL */
+  overflow: hidden;   /* 🔑 CLIPS BG */
+  background: #000;   /* fallback */
+}
+
+/* Background image is now isolated */
+.sacred-bg {
+  position: absolute;
+  inset: 0;
+  background: url("/images/wisdom.jpg") center / cover no-repeat;
+  z-index: 0;
+}
+
+/* Overlay controls visible height */
+.sacred-overlay {
+  position: relative;
+  z-index: 1;
+  background: rgba(124, 45, 18, 0.55);
+  padding: 140px 0; /* ONLY HERE */
+}
+
+/* Content */
+.sacred-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+/* Header */
+.sacred-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fde68a;
+  margin-bottom: 10px;
+}
+
+.sacred-subtitle {
+  font-size: 1.1rem;
+  color: #ffedd5;
+  margin-bottom: 80px;
+  letter-spacing: 0.04em;
+}
+
+/* Grid */
+.sacred-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+/* Cards (no hover) */
+.sacred-card {
+  background: rgba(124, 45, 18, 0.45);
+  border: 1px solid rgba(253, 230, 138, 0.35);
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: left;
+}
+
+/* Quote mark */
+.quote-mark {
+  font-size: 3rem;
+  color: #fde68a;
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* Sanskrit */
+.sacred-card h3 {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  color: #fff7ed;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* Translation */
+.translation {
+  font-size: 1rem;
+  color: #ffedd5;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+/* Source */
+.source {
+  font-size: 0.9rem;
+  color: #fde68a;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sacred-title {
+    font-size: 2.3rem;
+  }
+
+  .sacred-overlay {
+    padding: 100px 0;
+  }
+}
