@@ -187,3 +187,59 @@
 .kd-mobile-menu {
   display: none;
 }
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+/* =========================
+   MINIMAL HEADER EXTENSION
+   (DO NOT TOUCH BASE STYLES)
+========================= */
+
+/* Center content instead of left/right layout */
+.kd-header.minimal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Minimal header does NOT use inner wrapper */
+.kd-header.minimal .kd-header-inner {
+  display: none;
+}
+
+/* Logo container in minimal mode */
+.kd-header.minimal .kd-logo {
+  padding: 4px 8px;
+}
+
+/* Slightly compact text, but SAME identity */
+.kd-header.minimal .kd-logo-title {
+  font-size: 17px; /* slightly smaller, still bold */
+}
+
+.kd-header.minimal .kd-logo-sub {
+  font-size: 11px;
+}
+
+/* Optional: soften + pattern if you want (SAFE) */
+/*
+.kd-header.minimal {
+  background-size: 48px 48px;
+}
+*/
+
+

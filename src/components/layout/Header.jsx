@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, ShoppingCart, User } from "lucide-react";
+import { useCart } from "../../context/CartContext";
 import "./Header.css";
 
 export default function Header({ isLoggedIn = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { cartCount } = useCart();
 
   return (
     <header className="kd-header">
@@ -35,8 +38,15 @@ export default function Header({ isLoggedIn = false }) {
         <div className="kd-actions">
 
           {/* Cart */}
-          <button className="kd-icon-btn" aria-label="Cart">
+          <button
+            className="kd-icon-btn kd-cart-btn"
+            aria-label="Cart"
+            onClick={() => navigate("/checkout")}
+          >
             <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="kd-cart-badge">{cartCount}</span>
+            )}
           </button>
 
           {/* Profile OR Login */}
@@ -61,7 +71,7 @@ export default function Header({ isLoggedIn = false }) {
         </div>
       </div>
 
-      {/* MOBILE MENU (basic placeholder) */}
+      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="kd-mobile-menu">
           <Link to="/">Home</Link>

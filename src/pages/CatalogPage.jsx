@@ -1,92 +1,119 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import ProductCard from "../components/products/ProductCard";
 import { useCart } from "../context/CartContext";
-import { useNavigate } from "react-router-dom";
+import "../styles/catalog.css";
 
 export default function CatalogPage() {
-  const [products, setProducts] = useState([]);
-  const { items, totalAmount } = useCart();
-  const navigate = useNavigate();
+  const [productsBySlug, setProductsBySlug] = useState({});
+  const { addToCart } = useCart();
 
   useEffect(() => {
-    let ignore = false;
-
-    async function loadProducts() {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("is_active", true)
-        .order("name");
-
-      if (!ignore && !error) {
-        setProducts(data || []);
-      }
-    }
-
-    loadProducts();
-    return () => {
-      ignore = true;
-    };
+    // eslint-disable-next-line react-hooks/immutability
+    fetchProducts();
   }, []);
 
+  async function fetchProducts() {
+    const { data, error } = await supabase
+      .from("products")
+      .select(`
+        id,
+        name,
+        unit,
+        price_per_unit,
+        categories:categories!inner ( slug )
+      `)
+      .eq("is_active", true);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const grouped = {};
+    data.forEach((item) => {
+      const slug = item.categories?.slug;
+      if (!slug) return;
+      if (!grouped[slug]) grouped[slug] = [];
+      grouped[slug].push(item);
+    });
+
+    setProductsBySlug(grouped);
+  }
+
+  const milkRange = [
+    ...(productsBySlug["md-milk"] || []),
+    ...(productsBySlug["fresh-milk"] || []),
+  ];
+
+  const dairyEssentials = [
+    ...(productsBySlug["md-curd"] || []),
+    ...(productsBySlug["fresh-curd"] || []),
+    ...(productsBySlug["md-other"] || []),
+    ...(productsBySlug["fresh-other"] || []),
+  ];
+
+  const iceCreamRange = productsBySlug["md-icecream"] || [];
+
   return (
-    <div style={{ background: "#f9fbfd", minHeight: "100vh" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px" }}>
-        <h1 style={{ marginBottom: 6 }}>Our Fresh Products</h1>
-        <p style={{ color: "#6b7280", marginBottom: 28 }}>
-          Pure, fresh dairy sourced daily — delivered with care.
+    <main className="catalog-page">
+      <section className="catalog-hero">
+        <h1>Our Products</h1>
+        <p>Pure dairy, thoughtfully curated for everyday living.</p>
+      </section>
+
+      <CatalogSection
+        title="Milk Range"
+        subtitle="Fresh Kamdhenu milk and trusted Mother Dairy packs"
+        products={milkRange}
+        addToCart={addToCart}
+      />
+
+      <CatalogSection
+        title="Dairy Essentials"
+        subtitle="Paneer, curd and everyday dairy staples"
+        products={dairyEssentials}
+        addToCart={addToCart}
+      />
+
+      <CatalogSection
+        title="Mother Dairy Ice Cream"
+        subtitle="Indulgent flavours made with trusted dairy"
+        products={iceCreamRange}
+        addToCart={addToCart}
+      />
+
+      <section className="catalog-section coming-soon-section">
+        <h2>Pooja Materials</h2>
+        <p className="coming-soon-text">
+          Sacred offerings will be available soon.
         </p>
+      </section>
+    </main>
+  );
+}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-            gap: 24,
-          }}
-        >
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </div>
+function CatalogSection({ title, subtitle, products, addToCart }) {
+  return (
+    <section className="catalog-section">
+      <h2>{title}</h2>
+      <p className="section-subtitle">{subtitle}</p>
 
-      {items.length > 0 && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            background: "#ffffff",
-            borderTop: "1px solid #e5e7eb",
-            padding: "14px 20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            zIndex: 50,
-          }}
-        >
-          <div style={{ fontWeight: 600 }}>
-            {items.length} items • ₹{totalAmount}
+      <div className="product-grid">
+        {products.map((item) => (
+          <div className="product-card compact" key={item.id}>
+            <div className="product-info">
+              <h3>{item.name}</h3>
+              <p className="unit">{item.unit}</p>
+              <span className="price">₹{item.price_per_unit}</span>
+              <button onClick={() => addToCart(item)}>
+                Add to Cart
+              </button>
+            </div>
+
+            <div className="product-thumb-slot" />
           </div>
-
-          <button
-            onClick={() => navigate("/checkout")}
-            style={{
-              background: "#1f5eff",
-              color: "#fff",
-              padding: "12px 20px",
-              borderRadius: 12,
-              border: "none",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Go to Checkout
-          </button>
-        </div>
-      )}
-    </div>
+        ))}
+      </div>
+    </section>
   );
 }

@@ -1,80 +1,192 @@
+/* ===============================
+   CHECKOUT PAGE BASE
+================================ */
+
 .checkout-container {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 32px;
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  padding: 60px 6%;
+  background: #fffaf3;
 }
 
-.checkout-cart,
-.checkout-form {
-  background: #fff;
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+/* ===============================
+   LEFT: CART
+================================ */
+
+.checkout-cart {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+}
+
+.checkout-cart h2 {
+  margin-bottom: 20px;
+  font-size: 1.3rem;
 }
 
 .checkout-item {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 16px;
   align-items: center;
-  padding: 12px 0;
+  gap: 18px;
+  padding: 14px 0;
   border-bottom: 1px solid #f1f5f9;
 }
 
+.checkout-item:last-child {
+  border-bottom: none;
+}
+
+.checkout-unit {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Quantity controls */
 .checkout-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .checkout-controls button {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  background: white;
+  border-radius: 50%;
+  border: none;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 1rem;
   cursor: pointer;
 }
 
+.checkout-controls span {
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Price */
 .checkout-price {
+  font-weight: 600;
+}
+
+/* Total */
+.checkout-total {
+  margin-top: 24px;
+  text-align: right;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
-.checkout-total {
-  margin-top: 16px;
-  font-size: 18px;
-  font-weight: 800;
+/* ===============================
+   RIGHT: FORM
+================================ */
+
+.checkout-form {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
+.checkout-form h2 {
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+}
+
+.checkout-form h3 {
+  margin: 22px 0 10px;
+  font-size: 1rem;
+}
+
+/* Inputs */
 .checkout-form input,
 .checkout-form textarea {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+  outline: none;
 }
 
-.payment-option {
-  display: block;
-  margin-bottom: 10px;
+.checkout-form input:focus,
+.checkout-form textarea:focus {
+  border-color: #f59e0b;
 }
+
+/* ===============================
+   PAYMENT OPTIONS (ZOMATO STYLE)
+================================ */
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.payment-card {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #ffffff;
+}
+
+.payment-card:hover {
+  border-color: #f59e0b;
+}
+
+.payment-card.active {
+  border-color: #ea580c;
+  background: #fff7ed;
+  box-shadow: 0 8px 20px rgba(234, 88, 12, 0.12);
+}
+
+.payment-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.payment-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* ===============================
+   PLACE ORDER BUTTON
+================================ */
 
 .checkout-btn {
   width: 100%;
-  padding: 14px;
-  background: #0f172a;
-  color: white;
+  margin-top: 22px;
+  padding: 12px;
+  border-radius: 14px;
   border: none;
-  border-radius: 10px;
-  font-weight: 700;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
 }
 
+.checkout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   EMPTY CART
+================================ */
+
 .checkout-empty {
-  padding: 60px;
+  padding: 160px 20px;
   text-align: center;
+  font-size: 1.2rem;
+  color: #374151;
 }

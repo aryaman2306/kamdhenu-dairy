@@ -5,15 +5,16 @@ import LegendSection from '../components/home/LegendSection';
 import ProductGrid from '../components/products/ProductGrid';
 import SectionDivider from '../components/home/SectionDivider';
 import SacredWisdom from '../components/home/SacredWisdom';
+import OurProductsSection from '../components/home/OurProductsSection';
 
 export default function HomePage() {
   return (
     <div className="pt-20 md:pt-24">
       <HeroSection />
-      <SectionDivider/>
-      <TrustSection />
+      <OurProductsSection/>
       <PartnershipSection />
       <LegendSection />
+      <TrustSection />
       <SacredWisdom/>
     </div>
   );

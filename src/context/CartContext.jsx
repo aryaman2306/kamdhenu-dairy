@@ -1,81 +1,82 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(() => {
-    try {
-      const raw = localStorage.getItem('kamdhenu_cart_v1');
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      console.error('LocalStorage load failed:', e);
-      return [];
-    }
-  });
+  const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('kamdhenu_cart_v1', JSON.stringify(items));
-    } catch (e) {
-      console.error('LocalStorage save failed:', e);
-    }
-  }, [items]);
+  function addToCart(product) {
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
 
-  function setItemQuantity(product, quantity) {
-    setItems((prev) => {
-      if (quantity <= 0) {
-        return prev.filter((it) => it.productId !== product.id);
-      }
-
-      const existing = prev.find((it) => it.productId === product.id);
       if (existing) {
-        return prev.map((it) =>
-          it.productId === product.id ? { ...it, quantity } : it
+        // Increase quantity if product already exists
+        return prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
 
+      // Add new product with quantity = 1
       return [
         ...prev,
         {
-          productId: product.id,
-          name: product.name,
-          unit: product.unit,
-          pricePerUnit: Number(product.price_per_unit),
-          quantity,
+          ...product,
+          quantity: 1,
         },
       ];
     });
   }
 
-  function removeItem(productId) {
-    setItems((prev) => prev.filter((it) => it.productId !== productId));
+  function updateQuantity(productId, quantity) {
+    setCartItems((prev) =>
+      prev
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
   }
 
   function clearCart() {
-    setItems([]);
+    setCartItems([]);
   }
 
-  const totalAmount = useMemo(() => {
-    return items.reduce(
-      (sum, it) => sum + Number(it.pricePerUnit) * Number(it.quantity),
-      0
-    );
-  }, [items]);
+  const cartCount = cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
-  const value = {
-    items,
-    setItemQuantity,
-    removeItem,
-    clearCart,
-    totalAmount,
-  };
+  const totalAmount = cartItems.reduce(
+    (sum, item) =>
+      sum + item.price_per_unit * item.quantity,
+    0
+  );
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider
+      value={{
+        cartItems,
+        cartCount,
+        totalAmount,
+        addToCart,
+        updateQuantity,
+        clearCart,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be inside CartProvider');
+  if (!ctx) {
+    throw new Error("useCart must be used within CartProvider");
+  }
   return ctx;
 }

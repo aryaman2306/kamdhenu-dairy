@@ -1,19 +1,22 @@
-import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "../../context/CartContext";
 
 export default function FloatingCartButton() {
-  const { items } = useCart();
   const navigate = useNavigate();
+  const { cartCount } = useCart(); // ✅ FIXED
 
-  if (items.length === 0) return null;
+  // If cart is empty, don't show floating button
+  if (!cartCount || cartCount === 0) return null;
 
   return (
     <button
-      className="kd-floating-cart"
+      className="floating-cart-btn"
       onClick={() => navigate("/checkout")}
+      aria-label="View Cart"
     >
-      🛒
-      <span>{items.length}</span>
+      <ShoppingCart size={20} />
+      <span className="floating-cart-badge">{cartCount}</span>
     </button>
   );
 }
