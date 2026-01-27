@@ -55,6 +55,7 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
+      // 1️⃣ Create order
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
@@ -71,6 +72,7 @@ export default function CheckoutPage() {
 
       if (error) throw error;
 
+      // 2️⃣ Create order items
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_id: item.id,
@@ -87,9 +89,14 @@ export default function CheckoutPage() {
 
       if (itemsError) throw itemsError;
 
-      clearCart();
-
-      navigate(payment === "COD" ? "/thankyou" : "/payment");
+      // 3️⃣ Route based on payment
+      if (payment === "COD") {
+        clearCart();
+        navigate("/thankyou");
+      } else {
+        // ⚠️ Do NOT clear cart here
+        navigate(`/payment?orderId=${order.id}`);
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to place order. Please try again.");
@@ -160,7 +167,6 @@ export default function CheckoutPage() {
 
             <h3>Payment Method</h3>
 
-            {/* PAYMENT OPTIONS */}
             <div className="payment-options">
               <div
                 className={`payment-card ${

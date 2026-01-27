@@ -20,24 +20,32 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalyticsPage";
 import AdminExpensesPage from "./pages/admin/AdminExpensesPage";
 
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import ProfilePage from "./pages/ProfilePage";
+
 const HEADER_HEIGHT = 80; // single source of truth
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
-  const isMinimal =
-    location.pathname.startsWith("/checkout") ||
-    location.pathname.startsWith("/thankyou") ||
-    location.pathname.startsWith("/payment");
+  const pathname = location.pathname;
 
-  const isAdmin = location.pathname.startsWith("/admin");
+  const isMinimal =
+    pathname.startsWith("/checkout") ||
+    pathname.startsWith("/thankyou") ||
+    pathname.startsWith("/payment") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup");
+
+  const isAdmin = pathname.startsWith("/admin");
 
   return (
     <>
-      {/* Store Headers */}
+      {/* STORE HEADERS ONLY */}
       {!isAdmin && (isMinimal ? <MinimalHeader /> : <Header />)}
 
-      {/* Main Content Wrapper */}
+      {/* MAIN CONTENT */}
       <main
         style={{
           paddingTop: !isAdmin && !isMinimal ? HEADER_HEIGHT : 0,
@@ -46,7 +54,7 @@ function LayoutWrapper({ children }) {
         {children}
       </main>
 
-      {/* Floating Cart (store only) */}
+      {/* FLOATING CART (STORE ONLY) */}
       {!isAdmin && !isMinimal && <FloatingCartButton />}
     </>
   );
@@ -57,17 +65,24 @@ function App() {
     <BrowserRouter>
       <LayoutWrapper>
         <Routes>
-          {/* Public Store */}
+          {/* ================= STORE ================= */}
           <Route path="/" element={<HomePage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/thankyou" element={<ThankYouPage />} />
           <Route path="/payment" element={<PaymentPage />} />
 
-          {/* Admin Login */}
+          {/* ================= AUTH ================= */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          {/* ================= PROFILE (PROTECTED) ================= */}
+        
+         <Route path="/profile" element={<ProfilePage />} />
+
+          {/* ================= ADMIN LOGIN ================= */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
 
-          {/* Admin Protected Routes */}
+          {/* ================= ADMIN (PROTECTED) ================= */}
           <Route
             path="/admin"
             element={

@@ -1,16 +1,29 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext(null);
+const CART_KEY = "kamdhenu_cart_v1";
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
+  // ✅ Load cart from localStorage on first render
+  const [cartItems, setCartItems] = useState(() => {
+    try {
+      const stored = localStorage.getItem(CART_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // ✅ Persist cart to localStorage on every change
+  useEffect(() => {
+    localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+  }, [cartItems]);
 
   function addToCart(product) {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
 
       if (existing) {
-        // Increase quantity if product already exists
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
@@ -18,7 +31,6 @@ export function CartProvider({ children }) {
         );
       }
 
-      // Add new product with quantity = 1
       return [
         ...prev,
         {
@@ -43,8 +55,10 @@ export function CartProvider({ children }) {
 
   function clearCart() {
     setCartItems([]);
+    localStorage.removeItem(CART_KEY);
   }
 
+  // ✅ Cart badge count (unchanged logic)
   const cartCount = cartItems.reduce(
     (sum, item) => sum + item.quantity,
     0

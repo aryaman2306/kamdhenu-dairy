@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 
-export default function AdminProtectedRoute({ children }) {
+export default function AdminRoute({ children }) {
   const isAdmin = sessionStorage.getItem("isAdmin") === "true";
 
   if (!isAdmin) {

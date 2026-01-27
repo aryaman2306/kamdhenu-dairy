@@ -7,11 +7,14 @@ import "./styles/theme.css";
 import "./styles/layout.css";
 import "./styles/components.css";
 import "./styles/animations.css";
+import { AuthProvider } from './context/AuthContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <AuthProvider>
     <CartProvider>
       <App />
     </CartProvider>
-  </React.StrictMode>
+    </AuthProvider>
+</React.StrictMode>
 );

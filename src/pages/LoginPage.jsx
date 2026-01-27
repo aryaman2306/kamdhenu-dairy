@@ -1,26 +1,24 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "../supabaseClient";
 import MinimalHeader from "../components/layout/MinimalHeader";
 import "../styles/auth.css";
 
-export default function SignupPage() {
-  const { signup } = useAuth();
+export default function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setLoading(true);
 
-    const { data, error } = await signup(email, password);
+    const { error } = await login(email, password);
 
     if (error) {
       setError(error.message);
@@ -28,28 +26,7 @@ export default function SignupPage() {
       return;
     }
 
-    /**
-     * IMPORTANT:
-     * data.user can be null if email verification is enabled.
-     * Supabase will create the user after verification.
-     */
-    if (data?.user?.id) {
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: data.user.id,
-        });
-
-      if (profileError) {
-        console.error("Profile creation failed:", profileError);
-        // We do NOT block signup for this
-      }
-    }
-
-    setSuccess(
-      "Signup successful. Please verify your email before logging in."
-    );
-    setLoading(false);
+    navigate("/profile");
   }
 
   return (
@@ -58,10 +35,9 @@ export default function SignupPage() {
 
       <div className="page-with-minimal-header auth-container">
         <form className="auth-card" onSubmit={handleSubmit}>
-          <h2>Create Account</h2>
+          <h2>Welcome Back</h2>
 
           {error && <div className="auth-error">{error}</div>}
-          {success && <div className="auth-success">{success}</div>}
 
           <input
             type="email"
@@ -73,19 +49,19 @@ export default function SignupPage() {
 
           <input
             type="password"
-            placeholder="Password (min 6 chars)"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
           <button disabled={loading}>
-            {loading ? "Creating…" : "Sign Up"}
+            {loading ? "Signing in…" : "Login"}
           </button>
 
           <p className="auth-footer">
-            Already have an account?{" "}
-            <Link to="/login">Login</Link>
+            Don’t have an account?{" "}
+            <Link to="/signup">Sign up</Link>
           </p>
         </form>
       </div>

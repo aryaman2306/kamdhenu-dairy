@@ -6,6 +6,8 @@ import ProductGrid from '../components/products/ProductGrid';
 import SectionDivider from '../components/home/SectionDivider';
 import SacredWisdom from '../components/home/SacredWisdom';
 import OurProductsSection from '../components/home/OurProductsSection';
+import Footer from "../components/layout/Footer";
+
 
 export default function HomePage() {
   return (
@@ -13,9 +15,10 @@ export default function HomePage() {
       <HeroSection />
       <OurProductsSection/>
       <PartnershipSection />
-      <LegendSection />
       <TrustSection />
       <SacredWisdom/>
+      <Footer />
+
     </div>
   );
 }

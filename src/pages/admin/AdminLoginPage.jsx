@@ -1,75 +1,130 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../supabaseClient';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [username, setUsername] = useState("");
+  const [passkey, setPasskey] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  function handleLogin(e) {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-    try {
-      // eslint-disable-next-line no-unused-vars
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      // On success navigate to orders
-      navigate('/admin/orders');
-    } catch (err) {
-      setError(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
+    setError("");
+
+    // Username check
+    if (username.trim() !== "admin") {
+      setError("Invalid admin username");
+      return;
     }
+
+    // Passkey check (plain text – intentional)
+    const ADMIN_PASSKEY = import.meta.env.VITE_ADMIN_PASSKEY;
+
+    if (!ADMIN_PASSKEY) {
+      setError("Admin passkey not configured");
+      return;
+    }
+
+    if (passkey !== ADMIN_PASSKEY) {
+      setError("Invalid passkey");
+      return;
+    }
+
+    // Success
+    sessionStorage.setItem("isAdmin", "true");
+    navigate("/admin/dashboard");
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 520, margin: '40px auto' }}>
-      <h2>Admin Login</h2>
-      <p>Sign in to manage orders & products.</p>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f9fafb",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 24,
+      }}
+    >
+      <form
+        onSubmit={handleLogin}
+        style={{
+          width: "100%",
+          maxWidth: 360,
+          background: "#ffffff",
+          padding: "28px 24px",
+          borderRadius: 12,
+          border: "1px solid #e5e7eb",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: 6 }}>Admin Access</h2>
 
-      {error && <div style={{ color: 'crimson', marginBottom: 12 }}>{error}</div>}
+        <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
+          Restricted area — authorized personnel only
+        </p>
 
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 8 }}>
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          style={{ padding: 8 }}
-          required
-        />
-        <input
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          style={{ padding: 8 }}
-          required
-        />
-
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={loading} style={{ padding: '8px 12px', background: '#0b6', color: '#fff', border: 'none', borderRadius: 6 }}>
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              // simple sign-out helper (if needed)
-              supabase.auth.signOut();
+        {error && (
+          <div
+            style={{
+              background: "#fee2e2",
+              color: "#991b1b",
+              padding: 10,
+              borderRadius: 8,
+              fontSize: 13,
+              marginBottom: 14,
             }}
-            style={{ padding: '8px 12px', borderRadius: 6 }}
           >
-            Sign out
-          </button>
-        </div>
+            {error}
+          </div>
+        )}
+
+        <input
+          placeholder="Admin username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          autoFocus
+          style={{
+            width: "100%",
+            padding: 12,
+            marginBottom: 12,
+            borderRadius: 8,
+            border: "1px solid #d1d5db",
+            fontSize: 14,
+          }}
+        />
+
+        <input
+          type="password"
+          placeholder="Passkey"
+          value={passkey}
+          onChange={(e) => setPasskey(e.target.value)}
+          style={{
+            width: "100%",
+            padding: 12,
+            marginBottom: 16,
+            borderRadius: 8,
+            border: "1px solid #d1d5db",
+            fontSize: 14,
+          }}
+        />
+
+        <button
+          type="submit"
+          style={{
+            width: "100%",
+            padding: 12,
+            borderRadius: 999,
+            border: "none",
+            background: "#2563eb",
+            color: "#ffffff",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Enter Admin Panel
+        </button>
       </form>
     </div>
   );

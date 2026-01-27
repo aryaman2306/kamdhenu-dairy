@@ -1,5 +1,4 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { supabase } from "../../supabaseClient";
 import { useState } from "react";
 
 export default function AdminLayout() {
@@ -7,8 +6,9 @@ export default function AdminLayout() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
+  function handleLogout() {
+    // IMPORTANT: Admin auth is session-based, not Supabase
+    sessionStorage.removeItem("isAdmin");
     navigate("/admin/login");
   }
 
@@ -72,7 +72,7 @@ export default function AdminLayout() {
         </div>
       </div>
 
-      {/* Page Content */}
+      {/* Admin Page Content */}
       <Outlet context={{ fromDate, toDate }} />
     </div>
   );
