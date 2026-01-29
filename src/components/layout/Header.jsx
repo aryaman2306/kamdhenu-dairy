@@ -22,7 +22,7 @@ export default function Header({ isLoggedIn = false }) {
           />
           <div className="kd-logo-text">
             <div className="kd-logo-title">कामधेनु Kamdhenu</div>
-            <div className="kd-logo-sub">Sacred Blessings</div>
+            <div className="kd-logo-sub">Dairy</div>
           </div>
         </Link>
 

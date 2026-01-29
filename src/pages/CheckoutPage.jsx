@@ -6,12 +6,12 @@ import MinimalHeader from "../components/layout/MinimalHeader";
 import "../styles/checkout.css";
 
 export default function CheckoutPage() {
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, updateQuantity } = useCart();
   const navigate = useNavigate();
 
   const [quantities, setQuantities] = useState(
     cartItems.reduce((acc, item) => {
-      acc[item.id] = acc[item.id] || 1;
+      acc[item.id] = acc[item.id] || item.quantity || 1;
       return acc;
     }, {})
   );
@@ -33,10 +33,29 @@ export default function CheckoutPage() {
     );
   }
 
-  function changeQty(id, delta) {
+  function handleDecrease(itemId) {
+    setQuantities((prev) => {
+      const currentQty = prev[itemId];
+
+      // Remove item if qty is 1
+      if (currentQty === 1) {
+        updateQuantity(itemId, 0);
+        const copy = { ...prev };
+        delete copy[itemId];
+        return copy;
+      }
+
+      return {
+        ...prev,
+        [itemId]: currentQty - 1,
+      };
+    });
+  }
+
+  function handleIncrease(itemId) {
     setQuantities((prev) => ({
       ...prev,
-      [id]: Math.max(1, prev[id] + delta),
+      [itemId]: prev[itemId] + 1,
     }));
   }
 
@@ -55,7 +74,6 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Create order
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
@@ -72,7 +90,6 @@ export default function CheckoutPage() {
 
       if (error) throw error;
 
-      // 2️⃣ Create order items
       const orderItems = cartItems.map((item) => ({
         order_id: order.id,
         product_id: item.id,
@@ -89,12 +106,10 @@ export default function CheckoutPage() {
 
       if (itemsError) throw itemsError;
 
-      // 3️⃣ Route based on payment
       if (payment === "COD") {
         clearCart();
         navigate("/thankyou");
       } else {
-        // ⚠️ Do NOT clear cart here
         navigate(`/payment?orderId=${order.id}`);
       }
     } catch (err) {
@@ -109,7 +124,8 @@ export default function CheckoutPage() {
     <>
       <MinimalHeader />
 
-      <div className="page-with-minimal-header">
+      {/* 👇 EXTRA TOP SPACING FIX */}
+      <div className="page-with-minimal-header checkout-page">
         <div className="checkout-container">
           {/* LEFT — CART */}
           <div className="checkout-cart">
@@ -123,9 +139,13 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="checkout-controls">
-                  <button onClick={() => changeQty(item.id, -1)}>−</button>
+                  <button onClick={() => handleDecrease(item.id)}>
+                    −
+                  </button>
                   <span>{quantities[item.id]}</span>
-                  <button onClick={() => changeQty(item.id, 1)}>+</button>
+                  <button onClick={() => handleIncrease(item.id)}>
+                    +
+                  </button>
                 </div>
 
                 <div className="checkout-price">

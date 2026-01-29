@@ -56,6 +56,71 @@ export default function AdminOrdersPage() {
     setEditing(null);
   }
 
+  function renderEditableCell(order, field, type = "text") {
+    const isEditing =
+      editing?.orderId === order.id &&
+      editing?.field === field;
+
+    if (isEditing) {
+      if (type === "select-status") {
+        return (
+          <select
+            autoFocus
+            defaultValue={order[field]}
+            onBlur={(e) =>
+              commitChange(order.id, field, e.target.value)
+            }
+            style={select}
+          >
+            <option>PENDING</option>
+            <option>ACCEPTED</option>
+            <option>DELIVERING</option>
+            <option>DELIVERED</option>
+            <option>CANCELLED</option>
+          </select>
+        );
+      }
+
+      if (type === "select-payment") {
+        return (
+          <select
+            autoFocus
+            defaultValue={order[field] || "UNPAID"}
+            onBlur={(e) =>
+              commitChange(order.id, field, e.target.value)
+            }
+            style={select}
+          >
+            <option>UNPAID</option>
+            <option>PAID</option>
+          </select>
+        );
+      }
+
+      return (
+        <input
+          autoFocus
+          defaultValue={order[field]}
+          onBlur={(e) =>
+            commitChange(order.id, field, e.target.value)
+          }
+          style={input}
+        />
+      );
+    }
+
+    return (
+      <span
+        onDoubleClick={() =>
+          setEditing({ orderId: order.id, field })
+        }
+        style={{ cursor: "pointer" }}
+      >
+        {order[field]}
+      </span>
+    );
+  }
+
   if (loading) {
     return <PageWrap>Loading orders…</PageWrap>;
   }
@@ -80,97 +145,83 @@ export default function AdminOrdersPage() {
           </thead>
 
           <tbody>
-            {orders.map((o) => (
-              <tr
-                key={o.id}
-                style={{
-                  ...row,
-                  opacity: savingRow === o.id ? 0.6 : 1,
-                }}
-              >
-                <Td>
-                  {new Date(o.created_at).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </Td>
-                <Td>{o.customer_name}</Td>
-                <Td>{o.customer_phone}</Td>
-                <Td>₹{o.total_amount}</Td>
+            {orders.map((o) => {
+              const isEditingRow =
+                editing?.orderId === o.id;
 
-                <Td
-                  onDoubleClick={() =>
-                    setEditing({ orderId: o.id, field: "order_status" })
-                  }
+              return (
+                <tr
+                  key={o.id}
+                  style={{
+                    ...row,
+                    opacity:
+                      savingRow === o.id || isEditingRow
+                        ? 0.6
+                        : 1,
+                  }}
                 >
-                  {editing?.orderId === o.id &&
-                  editing?.field === "order_status" ? (
-                    <select
-                      autoFocus
-                      defaultValue={o.order_status}
-                      onBlur={(e) =>
-                        commitChange(o.id, "order_status", e.target.value)
+                  <Td>
+                    {new Date(o.created_at).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
                       }
-                      style={select}
-                    >
-                      <option>PENDING</option>
-                      <option>ACCEPTED</option>
-                      <option>DELIVERING</option>
-                      <option>DELIVERED</option>
-                      <option>CANCELLED</option>
-                    </select>
-                  ) : (
-                    <Badge type="status" value={o.order_status} />
-                  )}
-                </Td>
+                    )}
+                  </Td>
 
-                <Td
-                  onDoubleClick={() =>
-                    setEditing({ orderId: o.id, field: "payment_status" })
-                  }
-                >
-                  {editing?.orderId === o.id &&
-                  editing?.field === "payment_status" ? (
-                    <select
-                      autoFocus
-                      defaultValue={o.payment_status || "UNPAID"}
-                      onBlur={(e) =>
-                        commitChange(
-                          o.id,
-                          "payment_status",
-                          e.target.value
-                        )
+                  <Td>
+                    {renderEditableCell(
+                      o,
+                      "customer_name"
+                    )}
+                  </Td>
+
+                  <Td>
+                    {renderEditableCell(
+                      o,
+                      "customer_phone"
+                    )}
+                  </Td>
+
+                  <Td>₹{o.total_amount}</Td>
+
+                  <Td>
+                    {renderEditableCell(
+                      o,
+                      "order_status",
+                      "select-status"
+                    )}
+                  </Td>
+
+                  <Td>
+                    {renderEditableCell(
+                      o,
+                      "payment_status",
+                      "select-payment"
+                    )}
+                  </Td>
+
+                  <Td>
+                    <button style={whatsappBtn} disabled>
+                      WA
+                    </button>
+                  </Td>
+
+                  <Td>
+                    <button
+                      style={viewBtn}
+                      onClick={() =>
+                        navigate(`/admin/orders/${o.id}`)
                       }
-                      style={select}
                     >
-                      <option>UNPAID</option>
-                      <option>PAID</option>
-                    </select>
-                  ) : (
-                    <Badge
-                      type="payment"
-                      value={o.payment_status || "UNPAID"}
-                    />
-                  )}
-                </Td>
-
-                <Td>
-                  <button style={whatsappBtn} disabled>
-                    WA
-                  </button>
-                </Td>
-
-                <Td>
-                  <button
-                    style={viewBtn}
-                    onClick={() => navigate(`/admin/orders/${o.id}`)}
-                  >
-                    View
-                  </button>
-                </Td>
-              </tr>
-            ))}
+                      View
+                    </button>
+                  </Td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -194,34 +245,6 @@ function PageWrap({ children }) {
   );
 }
 
-function Badge({ value, type }) {
-  const colors =
-    type === "payment"
-      ? value === "PAID"
-        ? ["#dcfce7", "#065f46"]
-        : ["#fee2e2", "#991b1b"]
-      : value === "DELIVERED"
-      ? ["#dbeafe", "#1e3a8a"]
-      : value === "CANCELLED"
-      ? ["#fee2e2", "#991b1b"]
-      : ["#fef9c3", "#854d0e"];
-
-  return (
-    <span
-      style={{
-        padding: "6px 12px",
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 600,
-        background: colors[0],
-        color: colors[1],
-      }}
-    >
-      {value}
-    </span>
-  );
-}
-
 const card = {
   background: "#fff",
   borderRadius: 16,
@@ -237,7 +260,9 @@ const Th = ({ children }) => (
 );
 
 const Td = ({ children }) => (
-  <td style={{ padding: "14px 16px", fontSize: 14 }}>{children}</td>
+  <td style={{ padding: "14px 16px", fontSize: 14 }}>
+    {children}
+  </td>
 );
 
 const row = { borderBottom: "1px solid #f1f5f9" };
@@ -263,4 +288,11 @@ const select = {
   padding: "6px 10px",
   borderRadius: 8,
   border: "1px solid #d1d5db",
+};
+
+const input = {
+  padding: "6px 10px",
+  borderRadius: 8,
+  border: "1px solid #d1d5db",
+  width: "100%",
 };

@@ -1,21 +1,34 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const CartContext = createContext(null);
 const CART_KEY = "kamdhenu_cart_v1";
 
 export function CartProvider({ children }) {
-  // ✅ Load cart from localStorage on first render
-  const [cartItems, setCartItems] = useState(() => {
+  const hasHydrated = useRef(false);
+
+  // 🔒 SINGLE hydration point
+  const [cartItems, setCartItems] = useState([]);
+
+  // ✅ Hydrate cart ONLY once on mount
+  useEffect(() => {
+    if (hasHydrated.current) return;
+
     try {
       const stored = localStorage.getItem(CART_KEY);
-      return stored ? JSON.parse(stored) : [];
+      if (stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCartItems(JSON.parse(stored));
+      }
     } catch {
-      return [];
+      setCartItems([]);
     }
-  });
 
-  // ✅ Persist cart to localStorage on every change
+    hasHydrated.current = true;
+  }, []);
+
+  // ✅ Persist cart after hydration
   useEffect(() => {
+    if (!hasHydrated.current) return;
     localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
@@ -31,13 +44,7 @@ export function CartProvider({ children }) {
         );
       }
 
-      return [
-        ...prev,
-        {
-          ...product,
-          quantity: 1,
-        },
-      ];
+      return [...prev, { ...product, quantity: 1 }];
     });
   }
 
@@ -45,28 +52,27 @@ export function CartProvider({ children }) {
     setCartItems((prev) =>
       prev
         .map((item) =>
-          item.id === productId
-            ? { ...item, quantity }
-            : item
+          item.id === productId ? { ...item, quantity } : item
         )
         .filter((item) => item.quantity > 0)
     );
   }
 
+  // ✅ HARD RESET — no rehydration possible
   function clearCart() {
-    setCartItems([]);
+    hasHydrated.current = false;
     localStorage.removeItem(CART_KEY);
+    setCartItems([]);
+    hasHydrated.current = true;
   }
 
-  // ✅ Cart badge count (unchanged logic)
   const cartCount = cartItems.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
 
   const totalAmount = cartItems.reduce(
-    (sum, item) =>
-      sum + item.price_per_unit * item.quantity,
+    (sum, item) => sum + item.price_per_unit * item.quantity,
     0
   );
 

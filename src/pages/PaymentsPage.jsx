@@ -21,6 +21,7 @@ export default function PaymentsPage() {
     }
     // eslint-disable-next-line react-hooks/immutability
     fetchOrder();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
   async function fetchOrder() {
