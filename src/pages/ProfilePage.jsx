@@ -1,71 +1,49 @@
 import { useEffect, useState } from "react";
-import MinimalHeader from "../components/layout/MinimalHeader";
-import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
-import "../styles/profile.css";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
-  const [profile, setProfile] = useState(null);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
-    fetchProfile();
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
   }, []);
 
-  async function fetchProfile() {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    setProfile(data);
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate("/");
   }
 
-  async function updateProfile() {
-    await supabase
-      .from("profiles")
-      .update({
-        full_name: profile.full_name,
-        phone: profile.phone,
-      })
-      .eq("id", user.id);
-
-    alert("Profile updated");
+  if (!user) {
+    return <div style={{ padding: 120 }}>Loading profile…</div>;
   }
 
   return (
-    <>
-      <MinimalHeader />
+    <main style={{ padding: "120px 20px", maxWidth: 600, margin: "0 auto" }}>
+      <h1 style={{ marginBottom: 12 }}>My Profile</h1>
 
-      <div className="page-with-minimal-header profile-container">
-        <div className="profile-card">
-          <h2>Your Profile</h2>
-
-          <label>Full Name</label>
-          <input
-            value={profile?.full_name || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, full_name: e.target.value })
-            }
-          />
-
-          <label>Phone</label>
-          <input
-            value={profile?.phone || ""}
-            onChange={(e) =>
-              setProfile({ ...profile, phone: e.target.value })
-            }
-          />
-
-          <button onClick={updateProfile}>Save</button>
-
-          <button className="logout-btn" onClick={logout}>
-            Logout
-          </button>
-        </div>
+      <div style={{ marginBottom: 20 }}>
+        <strong>Email</strong>
+        <div>{user.email}</div>
       </div>
-    </>
+
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <button onClick={() => navigate("/support")}>
+          Raise Support Request
+        </button>
+
+        <button disabled>Edit Profile (Coming Soon)</button>
+
+        <button
+          onClick={handleLogout}
+          style={{ color: "#991b1b" }}
+        >
+          Logout
+        </button>
+      </div>
+    </main>
   );
 }

@@ -23,6 +23,8 @@ import AdminExpensesPage from "./pages/admin/AdminExpensesPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
+import AboutPage from "./pages/AboutPage";
+import SupportPage from "./pages/SupportPage";
 
 const HEADER_HEIGHT = 80; // single source of truth
 
@@ -71,6 +73,9 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/thankyou" element={<ThankYouPage />} />
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/support" element={<SupportPage />} />
+
 
           {/* ================= AUTH ================= */}
           <Route path="/login" element={<LoginPage />} />

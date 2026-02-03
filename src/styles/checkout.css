@@ -190,3 +190,19 @@
   font-size: 1.2rem;
   color: #374151;
 }
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .product-card {
+    padding: 16px;
+  }
+
+  .product-card button {
+    width: 100%;
+    padding: 12px;
+  }
+}

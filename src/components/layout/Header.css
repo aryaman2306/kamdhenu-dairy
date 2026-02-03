@@ -242,4 +242,17 @@
 }
 */
 
+@media (max-width: 768px) {
+  .kd-nav {
+    display: none;
+  }
+
+  .kd-logo-sub {
+    display: none;
+  }
+
+  .kd-header {
+    height: 64px;
+  }
+}
 

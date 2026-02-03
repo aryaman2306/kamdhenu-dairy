@@ -1,46 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, ShoppingCart, User } from "lucide-react";
+import { ShoppingCart, User } from "lucide-react";
 import { useCart } from "../../context/CartContext";
+import { supabase } from "../../supabaseClient";
 import "./Header.css";
 
-export default function Header({ isLoggedIn = false }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export default function Header() {
   const navigate = useNavigate();
   const { cartCount } = useCart();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setIsLoggedIn(!!data.session);
+    });
+
+    const {
+      data: listener,
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   return (
     <header className="kd-header">
       <div className="kd-header-inner">
-
-        {/* LEFT: LOGO */}
+        {/* LOGO */}
         <Link to="/" className="kd-logo">
-          <img
-            src="/images/cow-icon.png"
-            alt="Kamdhenu"
-            className="kd-logo-img"
-          />
+          <img src="/images/cow-icon.png" alt="Kamdhenu" className="kd-logo-img" />
           <div className="kd-logo-text">
             <div className="kd-logo-title">कामधेनु Kamdhenu</div>
             <div className="kd-logo-sub">Dairy</div>
           </div>
         </Link>
 
-        {/* CENTER: NAV */}
+        {/* NAV */}
         <nav className="kd-nav">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/catalog">Products</NavLink>
           <NavLink to="/about">About</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
+          <NavLink to="/support">Support</NavLink>
         </nav>
 
-        {/* RIGHT: ACTIONS */}
+        {/* ACTIONS */}
         <div className="kd-actions">
-
           {/* Cart */}
           <button
             className="kd-icon-btn kd-cart-btn"
-            aria-label="Cart"
             onClick={() => navigate("/checkout")}
           >
             <ShoppingCart size={20} />
@@ -49,9 +58,12 @@ export default function Header({ isLoggedIn = false }) {
             )}
           </button>
 
-          {/* Profile OR Login */}
+          {/* Login OR Profile */}
           {isLoggedIn ? (
-            <button className="kd-icon-btn" aria-label="Profile">
+            <button
+              className="kd-icon-btn"
+              onClick={() => navigate("/profile")}
+            >
               <User size={20} />
             </button>
           ) : (
@@ -59,27 +71,8 @@ export default function Header({ isLoggedIn = false }) {
               Login / Sign Up
             </Link>
           )}
-
-          {/* Hamburger */}
-          <button
-            className="kd-icon-btn"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Menu"
-          >
-            <Menu size={22} />
-          </button>
         </div>
       </div>
-
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="kd-mobile-menu">
-          <Link to="/">Home</Link>
-          <Link to="/catalog">Products</Link>
-          <Link to="/about">About</Link>
-          <Link to="/contact">Contact</Link>
-        </div>
-      )}
     </header>
   );
 }

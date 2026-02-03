@@ -7,7 +7,8 @@ export default function CatalogPage() {
   const [productsBySlug, setProductsBySlug] = useState({});
   const { addToCart } = useCart();
 
-  useEffect(() => {
+  useEffect(() =>
+     {
     // eslint-disable-next-line react-hooks/immutability
     fetchProducts();
   }, []);
